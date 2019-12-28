@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+import json
 import time
-
+from ..items import EmployspiderItem
 import requests
 import scrapy
 from urllib import parse
@@ -49,8 +50,36 @@ class BaiduSpider(scrapy.Spider):
         return total
 
     def parse_one(self, response):
-        pass
-
+        html = json.loads(response.text)
+        # postId: 144509
+        # name: "语音技术部_语音服务开发工程师"
+        # publishDate: "2019-12-23"
+        # postType: "社招-T技术-标准"
+        # workPlace: "北京市"
+        # workYears: "不限"
+        # recruitNum: 1
+        # workType: "全职"
+        # serviceCondition: "-熟悉c++/python/shell等编程语言
+        # < br > -熟悉高并发线上集群服务的搭建和优化
+        # < br > -了解常见的机器学习和自然语言处理算法
+        # < br > -良好的团队合作和沟通能力，快速准确的理解能力，极强的自我驱动力，有一定的抗
+        # 压能力，有责任心，对解决问题充满热情
+        # "
+        # workContent: "-负责语音识别产品中，前沿创新产品方向的架构搭建、开发、迭代等工作
+        # < br > -根据产品需求及技术趋势，不断优化语音交互架构并保证服务稳定性
+        # < br > -基于线上大规模数据，挖掘相关特征，提升语音交互体验
+        # orgName: "百度"
+        # replace(old, new[, max])
+        item = EmployspiderItem()
+        print(html['postList'][1]['workContent'].replace('<br>',''))
+        for i in html['postList']:
+            item['name'] = i['name']
+            item['site'] = i['workPlace']
+            item['type'] = i['postType']
+            item['update_time'] = i['publishDate']
+            item['duty'] = i['workContent'].replace('<br>','')
+            item['claim'] = i['serviceCondition'].replace('<br>','')
+            yield item
 
     def parse(self, response):
         pass

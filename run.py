@@ -1,7 +1,7 @@
 from scrapy import cmdline
-
-
-# cmdline.execute('scrapy crawl employ'.split())
+#
+#
+# # cmdline.execute('scrapy crawl employ'.split())
 cmdline.execute('scrapy crawl baidu'.split())
 
 
@@ -25,3 +25,6 @@ cmdline.execute('scrapy crawl baidu'.split())
 # 阳泉:0/4/43/52113720
 # 其他:0/4/598/196769865
 # 海外:0/4/90100/196769930
+
+
+
