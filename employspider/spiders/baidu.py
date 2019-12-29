@@ -14,19 +14,11 @@ class BaiduSpider(scrapy.Spider):
     allowed_domains = ['www.baidu.com']
     # start_urls = ['http://www.baidu.com/']
     one_url = 'https://talent.baidu.com/baidu/web/httpservice/getPostList?postType=&workPlace={}&recruitType=2&keyWord={}&pageSize=10&curPage={}&_={}'
-    key = parse.quote(input('请输入职位:'))
+    res = input('请输入职位:')
+    key = parse.quote(res)
     headers = {'User-Agent': UserAgent().random}
 
     def start_requests(self):
-        for i in ['0/4/7/9', '0/4/10/11', '0/4/204/207',
-                  '0/4/248/249', '0/4/396/397', '0/4/396/399'
-            , '0/4/396/432', '0/4/450/452', '0/4/43/52113720', '0/4/598/196769865', '0/4/90100/196769930']:
-            count = self.get_num(i)
-            for w in range(1,count+1):
-                url = self.one_url.format(i,self.key,w,int(time.time()))
-                yield scrapy.Request(url=url,callback=self.parse_one)
-
-    def get_num(self, workPlace):
         # 北京:0/4/7/9
         # 上海:0/4/10/11
         # 杭州市:0/4/204/207
@@ -38,11 +30,21 @@ class BaiduSpider(scrapy.Spider):
         # 阳泉:0/4/43/52113720
         # 其他:0/4/598/196769865
         # 海外:0/4/90100/196769930
+        for i in ['0/4/7/9', '0/4/10/11', '0/4/204/207',
+                  '0/4/248/249', '0/4/396/397', '0/4/396/399',
+                  '0/4/396/432', '0/4/450/452', '0/4/43/52113720',
+                  '0/4/598/196769865', '0/4/90100/196769930']:
+            count = self.get_num(i)
+            for w in range(1, count + 1):
+                url = self.one_url.format(i, self.key, w, int(time.time()))
+                yield scrapy.Request(url=url, callback=self.parse_one)
+
+    def get_num(self, workPlace):
+
         i = parse.quote(workPlace)
         url = self.one_url.format(i, self.key, 1, int(time.time()))
         html = requests.get(url=url, headers=self.headers).json()
         count = html['rowCount']
-        print(1111,i,count)
         if count % 10 == 0:
             total = count // 10
         else:
@@ -71,14 +73,15 @@ class BaiduSpider(scrapy.Spider):
         # orgName: "百度"
         # replace(old, new[, max])
         item = EmployspiderItem()
-        print(html['postList'][1]['workContent'].replace('<br>',''))
         for i in html['postList']:
             item['name'] = i['name']
             item['site'] = i['workPlace']
             item['type'] = i['postType']
             item['update_time'] = i['publishDate']
-            item['duty'] = i['workContent'].replace('<br>','')
-            item['claim'] = i['serviceCondition'].replace('<br>','')
+            item['duty'] = i['workContent'].replace('<br>', '').replace('\r', '')
+            item['claim'] = i['serviceCondition'].replace('<br>', '').replace('\r', '')
+            item['key'] = self.res
+            item['stem_from'] = '百度招聘'
             yield item
 
     def parse(self, response):

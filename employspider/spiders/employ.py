@@ -13,8 +13,8 @@ class EmploySpider(scrapy.Spider):
     # start_urls = ['http://careers.tencent.com/']
     one_url = 'https://careers.tencent.com/tencentcareer/api/post/Query?timestamp=1566266592644&countryId=&cityId=&bgIds=&productId=&categoryId=&parentCategoryId=&attrId=&keyword={}&pageIndex={}&pageSize=10&language=zh-cn&area=cn'
     two_url = 'https://careers.tencent.com/tencentcareer/api/post/ByPostId?timestamp=1566266695175&postId={}&language=zh-cn'
-    position = input("请输入要搜索的职位")
-    position = parse.quote(position)
+    key = input("请输入要搜索的职位")
+    position = parse.quote(key)
     headers = {'User-Agent': UserAgent().random}
 
     def start_requests(self):
@@ -68,4 +68,6 @@ class EmploySpider(scrapy.Spider):
         item['update_time'] = html['Data']['LastUpdateTime']
         item['duty'] = html['Data']['Responsibility']
         item['claim'] = html['Data']['Requirement']
+        item['key'] = self.key
+        item['stem_from'] = '腾讯招聘'
         yield item

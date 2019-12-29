@@ -17,3 +17,5 @@ class EmployspiderItem(scrapy.Item):
     update_time = scrapy.Field()  # 发布日期
     duty = scrapy.Field()  # 工作职责
     claim = scrapy.Field()  # 工作要求
+    key = scrapy.Field()  # 搜索内容
+    stem_from = scrapy.Field()  # 来源
